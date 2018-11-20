@@ -5,7 +5,7 @@
 </template>
 
 <script>
-
+import Login from './view/login/Login.vue'
 export default {
   name: 'app',
   components: {
@@ -14,6 +14,9 @@ export default {
 </script>
 
 <style>
+body{
+	margin:0;
+}
 #app {
     height: 100%;
 }

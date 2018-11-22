@@ -17,7 +17,7 @@
       <div class="row" @click="styleState = true"><img class="block-icon" src="../assets/img/size.png"><span>风格设置</span></div>
     </div>
   </div>
-  <div class="resume"></div>
+  <div class="resume"><module1></module1></div>
   <div class="module" v-show="moduleState">
     <div class="module-back" @click="moduleState = false"><img src="../assets/img/back-block.png"><span>缩起</span></div>
     <div class="module-row" style="margin-top:15px;">
@@ -71,12 +71,29 @@
     <span class="grade-evaluating">简历评测</span>
   </div>
   <div class="tip">
+    <span class="">简历小贴士</span>
+    <el-collapse v-model="activeName" accordion>
+      <el-collapse-item title="● 简历上需要放照片吗？" name="1">
+        <p>此为非必选项，但如果放上去的话请务必让它成为加分项，毕竟这个看脸的世界越来越没有道理可言了，如果翻遍电脑和手机都没有找到一张可以称得上有气质的照片，那还是别放了。</p>
+      </el-collapse-item>
+      <el-collapse-item title="● 照片有什么标准规范？" name="2">
+        <p>建议使用1-6个月的近期免冠照片，男性请至少干净整洁，不要显得油腻，女生可化淡妆，正常的生活/工作照也可，表情动作大方自然，背景清新简洁的正脸半身照为佳</p>
+      </el-collapse-item>
+      <el-collapse-item title="● 简历必填的基本信息" name="3">
+        <p>姓名/所在城市/电话号码/联系邮箱</p>
+      </el-collapse-item>
+      <el-collapse-item title="● 求职意向要注意哪些规范？" name="4">
+        <p>如四大、国有银行等在招聘信息中不分具体职能部门的话，可以不写求职意向。如需要填写求职意向，则建议一份简历只针对一个意向岗位。</p>
+      </el-collapse-item>
+    </el-collapse>
   </div>
 </div>
 </template>
 
 <script>
 import $ from "jquery";
+import API from "../fetch/api.js";
+import module1 from "./module/module1";
 
 export default {
   data() {
@@ -86,7 +103,8 @@ export default {
       titleState: true,
       moduleState: false,
       changeState: false,
-      styleState: true,
+      styleState: false,
+      activeName: 1,
       fontSize: "12",
       fontSizeArr: [{
         value: '12',
@@ -120,7 +138,19 @@ export default {
 
     }
   },
-  created() {},
+  components: {
+    module1
+  },
+  created() {
+    API.reglet({
+      username: '123123213',
+      password: '123123',
+      question: "1",
+      answer: '12312'
+    }).then( res=> {
+      console.log(res)
+    })
+  },
   methods: {
     titleInputOpen() {
       var self = this
@@ -133,7 +163,12 @@ export default {
   }
 }
 </script>
-
+<style>
+.el-collapse-item__header {
+  color: #5c6876;
+  border: none;
+}
+</style>
 <style lang="scss" scoped>
 .Edit {
     // position: absolute;
@@ -251,15 +286,15 @@ export default {
         height: 1160px;
         min-height: 1160px;
         background: white;
-        position: absolute;
+        position: relative;
         top: 0;
         left: 0;
-        margin-top: 72px;
+        top: 72px;
         margin-left: 256px;
         box-shadow: 0 0 8px 0 rgba(0,0,0,0.2);
     }
     .grade {
-        width: 200px;
+        width: 250px;
         height: 100px;
         position: absolute;
         top: 72px;
@@ -282,12 +317,19 @@ export default {
         }
     }
     .tip {
-        width: 200px;
+        width: 250px;
         height: auto;
         position: absolute;
         top: 180px;
         left: 1088px;
         background: white;
+        padding: 15px;
+        span {
+            border-bottom: 1px dashed #e4e3e3;
+            font-size: 16px;
+            font-weight: bold;
+            color: #3e3e3e;
+        }
     }
     .style-select {
         position: fixed;

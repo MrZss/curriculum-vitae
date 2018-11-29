@@ -16,7 +16,6 @@ axios.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-
 export function fetch(url, params) {
   return new Promise((resolve, reject) => {
     axios.post(url, params).then(response => {
@@ -34,4 +33,16 @@ export default {
   reglet(params) {
     return fetch('reglet', params)
   },
+  savetemplate(params) {
+    return fetch('savetemplate', params)
+  },
+  listlet(params) {
+    return fetch('listlet', params)
+  },
+  getdata(params) {
+    return fetch('getdata', params)
+  },
+  savedata(params) {
+    return fetch('savedata', params)
+  }
 }

@@ -3,6 +3,9 @@
 #app {
     height: 100%;
 }
+body{
+	margin:0;
+}
 </style>
 <template>
   <div id="app">
@@ -11,7 +14,6 @@
 </template>
 
 <script>
-import Login from './view/login/Login.vue'
 export default {
   name: 'app',
   components: {
@@ -20,10 +22,6 @@ export default {
 </script>
 
 <style>
-body{
-	margin:0;
-}
-#app {
-    height: 100%;
-}
+
+
 </style>

@@ -2,68 +2,80 @@
 <div class="wrap" :style = "{backgroundImage: 'url(' + bgImg + ')' }"> 
   <div class="header">
       <img id = "logo" src = "../assets/images/login/diamond.png" />
+      <h1 class= "title">极简智能简历平台</h1>
       <div class="login-btn">
         <span ref = "loginText" @click = "displayLoginForm()">登录</span>/
         <span ref = "registerText" @click = "displayRegisterForm()">注册</span>
       </div>
   </div> 
-  <h1 class= "title">极简智能简历</h1>
+  
   <!--entrance-->
   <div class = "entrance" v-if = "entranceDisplay">
     <img src="../assets/images/login/Go2x.png"  @click = "displayLoginForm()">   
   </div> 
   <!--login-->
-  <div class="form-wrap login" v-if = "loginDisplay">
+  <div class="form-wrap login" v-if = "loginDisplay">      
       <form class = "login-form" > 
-        <img id="close-btn" src = "../assets/images/login/close-btn.png"  /> 
-        <h2>登录</h2>  
+        <img id="close-btn" src = "../assets/images/login/close-btn.png"  />
+        <h2 class = "form-title">登录</h2>  
+        <div class="note-div" v-if="loginNoteFlag" >
+          <img class = "note-img" src="../assets/images/login/note.png">
+          <span class = "note-span" id="login1">{{loginNote}}</span>
+        </div>
         <p class = "input-p"> 
            <img id = "account-img" src= "../assets/images/login/avatar.png"/>
-           <input type="text" name="account" >
+           <input type="text" name="username" v-model = "username" @focus = "loginNoteHidden($event)"/>
         </p>
         <p class = "input-p"> 
             <img id = "password-img" src= "../assets/images/login/key.png"/>
-            <input type="text" name="password" /> 
+            <input type="password" name="password" v-model = "password" @focus = "loginNoteHidden1($event)"/> 
         </p>
+        
         <p id = "but-p">
-          <button class = "commit-btn login-btn">
-            <img src = "../assets/images/login/tractor.png" />
+          <button class = "commit-btn login-btn" type = "button" @click =" login()">
+            <!-- <img src = "../assets/images/login/tractor.png" /> -->
             <img src = "../assets/images/login/register.png" />
           </button>
         </p>  
         <p id = "forget-psw-note" @click = "displayFindForm()">忘记密码？</p>
-    </form>
+     </form>
   </div>
-
 
   <!--register-->
   <div class=" form-wrap register-div" v-if = "registerDisplay">
       <form class = "register-form" > 
-        <input type="text" name="nickname" placeholder="昵称">
-        <input type="password" name="password" placeholder="密码（至少6位）">
-        <input type="text" name="e-mail" placeholder="邮箱，可选">
-        <p id = "form-text-p code-note-p">为了避免遗忘，请您填写真实信息，这将帮助您以后通过回答问题快速找回QQ密码。</p>
-
-        <select id = "code-question">
+        <h2 class = "form-title">注册</h2> 
+        <div class="note-div" v-if="registerNoteFlag">
+          <img class = "note-img" src="../assets/images/login/note.png">
+          <span class = "note-span">{{registerNote}}</span>
+        </div>
+        <input type="text" name="usernamereg" placeholder="账号" v-model = "usernamereg" @focus = "registerNoteHidden()">
+        <input type="password" name="password" placeholder="密码（至少6位）" v-model = "passwordreg">
+        <p class = "form-text-p ">为了避免遗忘，请您填写真实信息，这将帮助您以后通过回答问题快速找回QQ密码。</p>
+        <select id = "code-question" v-model = "questionreg">
             <option v-for = "question in questions" :key ="question.value" :value = "question.value">{{question.content}}</option>
         </select>
-        <input type="text" name="answer" placeholder="问题答案">
+        <input type="text" name="answer" placeholder="问题答案" v-model = "answerreg">
 
-        <button class = "commit-btn register-btn">
+        <button class = "commit-btn register-btn" type = "button" @click = "register()">
             <img src = "../assets/images/login/register.png" />
         </button>        
       </form>
   </div>
 
   <!-- 找回密码 -->
-  <div class=" form-wrap find-psw-div" v-if = "findPswDisplay">
+  <div class=" form-wrap find-psw-div" v-if = "findPswDisplay">    
       <form class = "find-psw-form" > 
-        <p class = "form-text-p fine-psw-p">您设置的密保问题为：</p>
-        <p class = "form-text-p fine-psw-p">您母亲的姓名是？</p>
-        
+        <h2 class = "form-title">找回密码</h2> 
+        <div class="note-div" v-if="findPswNoteFlag">
+          <img class = "note-img" src="../assets/images/login/note.png">
+          <span class = "note-span">消息提示</span>
+        </div>
+        <input type="text" name="nickname" placeholder="账号">
+        <p class = "form-text-p find-psw-p">您设置的密保问题为：</p>
+        <p class = "form-text-p find-psw-p">您母亲的姓名是？</p>        
         <input type="text" name="answer" placeholder="问题答案">
-
-        <button class = "commit-btn find-psw-btn">
+        <button class = "commit-btn find-psw-btn" type = "button" @click = "findPassword()">
             <img src = "../assets/images/login/register.png" />
         </button>        
       </form>
@@ -71,10 +83,15 @@
 
   <!-- 设置密码 -->
   <div class=" form-wrap set-psw-div" v-if = "setPswDisplay">
-      <form class = "set-psw-form" >        
+      <form class = "set-psw-form" > 
+       <h2 class = "form-title">设置密码</h2>  
+       <div class="note-div" v-if="setPswNoteFlag">
+          <img class = "note-img" src="../assets/images/login/note.png">
+          <span class = "note-span">消息提示</span>
+        </div>     
         <input type="text" name="new-password" placeholder="输入新密码">
         <input type="text" name="new-password" placeholder="再次输入新密码">
-        <button class = "commit-btn set-psw-btn">
+        <button class = "commit-btn set-psw-btn" type = "button">
             <img src = "../assets/images/login/register.png" />
         </button>        
       </form>
@@ -84,7 +101,9 @@
 </template>
 
 <script>
-  import BgImg from '@/assets/images/login/background.png'  
+  import BgImg from '@/assets/images/login/background.png' 
+  import $ from "jquery";
+  import API from "../fetch/api.js"; 
 
   export default {
     data() {
@@ -103,11 +122,36 @@
              {value:"10",content:"您母亲的生日是？"},
              {value:"11",content:"您配偶的生日是？"}
          ],
+
+         //显示面板
          entranceDisplay:true,
          loginDisplay:false,
          registerDisplay:false,
          findPswDisplay:false,
-         setPswDisplay:false,         
+         setPswDisplay:false, 
+         
+         //是否显示提示信息
+         setPswNoteFlag: false, 
+         findPswNoteFlag: false, 
+         registerNoteFlag: false, 
+         loginNoteFlag: false, 
+
+         //提示信息 
+         loginNote :'',
+         registerNote: '',
+
+         //login
+         username: '',  
+         password: '' ,
+
+         //register
+         usernamereg: '',
+         passwordreg: '',
+         questionreg: '',
+         answerreg: '',
+
+         //findpassword
+         usernamefind: '',
       }
     },
     created() {
@@ -118,8 +162,7 @@
          this.loginDisplay = true;
          this.registerDisplay = false;
          this.findPswDisplay = false;
-         this.setPswDisplay = false;
-         console.log(this.$refs);
+         this.setPswDisplay = false;        
          this.$refs.loginText.style.color = "#666";
          this.$refs.registerText.style.color = "black";
       },
@@ -140,8 +183,101 @@
          this.setPswDisplay = false;
          this.$refs.loginText.style.color = "black";
          this.$refs.registerText.style.color = "black";
-      }
+      },
 
+      /*****login**********/
+      login:function(){  
+         var name = this.username;
+         var psw = this.password;
+         if(name == '' || psw == ''){
+             this.loginNoteFlag = true;              
+             this.loginNote = '请填写完整的账号和密码'; 
+         }else{
+            var self = this;
+            API.loglet({
+              username: name,
+              password: psw,          
+            }).then( res=> {
+                if(res.success == true){
+                  self.$router.push('editDetail');
+                }else{
+                  this.loginNote ='用户名或密码不正确';
+                  this.loginNoteFlag = true; 
+                }
+            })
+         }         
+      },
+
+      loginNoteHidden:function(event){
+         this.loginNoteFlag = false; 
+         this.username ='';
+         this.password = '';
+      },
+
+      loginNoteHidden1:function(event){
+         this.loginNoteFlag = false; 
+         this.password = '';
+      },
+
+      /*******register*************/
+      register:function(){
+         var name = this.usernamereg;
+         var psw = this.passwordreg;
+         var que = this.questionreg;
+         var answer = this.answerreg;
+         if(name == '' || psw == '' ||que == '' || answer == ''){
+             this.registerNoteFlag = true;              
+             this.registerNote = '请将信息被充完整后再注册'; 
+         }else{
+            API.reglet({
+              username: name,
+              password: psw,
+              question: que,
+              answer: answer          
+            }).then( res=> {                
+                if(res.success == true){                 
+                  this.$router.push('editDetail');
+                }else{
+                   this.registerNote =res.msg;
+                   this.registerNoteFlag = true; 
+                }
+            })
+         }   
+      },
+
+      registerNoteHidden:function(event){
+         this.registerNoteFlag = false; 
+         this.usernamereg ='';
+         this.passwordreg = '';
+         this.questionreg = '';
+         this.answerreg = '';
+      },
+
+      /********findPassword***********/
+      findPassword: function(){
+         var name = '123123213'  //this.usernamefind;
+
+         alert(name);
+         if(name == ''){
+             // this.registerNoteFlag = true;              
+             // this.registerNote = '请将信息被充完整后再注册'; 
+         }else{
+            API.findQuestion({
+                username: name,       
+            }).then( res=> {                
+                if(res.success == true){     
+                  alert(res);            
+                  // this.$router.push('editDetail');
+                }else{
+                  alert("wrong");
+                   // this.registerNote =res.msg;
+                   // this.registerNoteFlag = true; 
+                }
+            })
+         } 
+      },
+     
+    /************************************/
     }
   }
 </script>
@@ -176,6 +312,8 @@
       background-size: 30%;
       padding-top:0;
       position: relative;
+      margin-top:160px;
+      padding-bottom: 30px;
     }
 
   input{
@@ -203,7 +341,7 @@
     background-color: rgba(255,255,255,0);
     background-repeat: no-repeat;
     overflow:hidden;
-    margin-top:30px;
+    
   }
 
   .commit-btn img{
@@ -216,7 +354,20 @@
     padding-left: 10px;
     line-height: 2rem;
  }
-
+ .note-div{
+  text-align: right;
+  margin-right:50px;
+  margin-bottom:18px;
+ }
+form .note-img{
+  width:20px;
+  height:20px;
+  margin-right:5px;
+}
+.note-span{
+  font-size:20px;
+  color:red;
+}
   /*************************/
   .wrap{
     background-size:cover;
@@ -240,8 +391,8 @@
   #logo{     
      width:50px;
      height:50px;
+     margin-top:25px;
      margin-left:5%;
-     margin-top:20px;
      float:left;
   }
   .header .login-btn{
@@ -258,18 +409,19 @@
   }
 
   .title{
-      font-size: 50px;
+      font-size: 32px;
       font-weight: lighter;
       max-width: 400px;
-      margin:100px auto;
-      color:#666;
-      font-family: 'Chinese Quote',-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Helvetica Neue',Helvetica,Arial,sans-serif; 
-     padding-left:100px;
+      line-height: 100px;
+      margin-left: 10px;
+      color:#555;
+      float:left;
+      font-family: 'Microsoft YaHei',Helvetica,Arial,sans-serif;   
   }
 
   /******entrance*******/
   .entrance{
-    margin:160px auto;
+    margin:230px auto;
     width:200px;
   }
   .entrance img{ 
@@ -295,6 +447,7 @@
       color:#666;
       margin-top:8%;
       overflow:hidden;
+      margin-bottom:30px;
     }
 
   .login form .input-p{
@@ -323,7 +476,7 @@
     font-size: 28px;
     color:#555;
     line-height:48px;
-    width:334px;
+    width:338px;
     margin-left:10px;
     border-left:1px #979797 solid;
     padding-left:5px;
@@ -344,6 +497,13 @@
       cursor: pointer;
    }
 
+   .login form .note-img{
+      width:20px;
+      height:20px;
+      margin-right:5px;
+      float:none;
+    }
+
 /*******register*********/
  .register-form{
    position:relative;
@@ -360,7 +520,6 @@
     width:93%;
     margin-top:30px;
     text-indent: 1rem;
-
     font-size: 20px;
     color: #555;
     line-height: 48px;
@@ -389,18 +548,17 @@
     width:80px;
   }
 
+.register-form .form-text-p{
+  margin-left:10px;
+  margin-right:10px;
+  margin-bottom:15px;
+}
 /*****find-psw-form*******/
 
-.find-psw-form{
-  padding-top:30px;
-}
 .find-psw-form p{
-  line-height:1.3rem;
-}
-
-.find-psw-form p:nth-child(2){
-  text-indent:2.5rem;
-  margin-bottom:30px;
+  line-height:1.8rem;
+  margin-bottom:10px;
+  color:black;
 }
 
 /*****set-psw-form*****/

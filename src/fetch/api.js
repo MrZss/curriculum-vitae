@@ -34,4 +34,7 @@ export default {
   reglet(params) {
     return fetch('reglet', params)
   },
+  loglet(params) {
+    return fetch('loglet', params)
+  },
 }

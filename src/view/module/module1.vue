@@ -311,19 +311,13 @@ export default {
 </script>
 <style lang="scss">
 .avatar-uploader .el-upload {
-    // border: 1px dashed #00c091;
+    border: 1px dashed #00c091;
     border-radius: 6px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
 }
-.avatar-uploader .el-upload:hover {
-    border: 1px dashed #00c091;
-    // border-radius: 6px;
-    // cursor: pointer;
-    // position: relative;
-    // overflow: hidden;
-}
+
 .avatar-uploader .el-upload:hover {
     border-color: #00c091;
 }
@@ -421,7 +415,7 @@ export default {
         flex-direction: column;
         align-items: center;
         .base-option {
-            // border: 1px dashed #00c091;
+            border: 1px dashed #00c091;
             width: 200px;
             height: 200px;
             margin-top: 20px;
@@ -434,16 +428,12 @@ export default {
             }
         }
         .base-option:hover {
-          border: 1px dashed #00c091;
             .edit-icon {
                 display: block;
             }
         }
-        .interest:hover{
-          border: 1px dashed #00c091;
-        }
         .interest {
-            // border: 1px dashed #00c091;
+            border: 1px dashed #00c091;
             width: 200px;
             height: auto;
             margin-top: 20px;
@@ -487,9 +477,6 @@ export default {
         flex-direction: column;
         align-items: center;
         background: white;
-        .user-base:hover{
-          border: 1px dashed #00c091;
-        }
         .user-base {
             min-height: 140px;
             width: 90%;
@@ -503,7 +490,7 @@ export default {
             -webkit-box-pack: center;
             -ms-flex-pack: center;
             justify-content: center;
-            // border: 1px dashed #00c091;
+            border: 1px dashed #00c091;
             margin-top: 15px;
             .name {
                 height: 30px;
@@ -518,12 +505,9 @@ export default {
 
             }
         }
-        .intention:hover{
-          border: 1px dashed #00c091;
-        }
         .intention {
             width: 90%;
-            // border: 1px dashed #00c091;
+            border: 1px dashed #00c091;
             height: auto;
             padding-bottom: 10px;
             margin-top: 10px;
@@ -544,14 +528,11 @@ export default {
 
             }
         }
-        .repeat-block:hover{
-          border: 1px dashed #00c091;
-        }
         .repeat-block {
             width: 90%;
             position: relative;
             margin-top: 10px;
-            // border: 1px dashed #00c091;
+            border: 1px dashed #00c091;
             .top {
                 height: 26px;
                 width: 100%;

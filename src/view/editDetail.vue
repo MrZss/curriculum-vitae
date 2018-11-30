@@ -4,12 +4,12 @@
     <img class="logo" src="../assets/img/logo.png">
     <span class="save-time">{{saveTime}}</span>
     <h4 v-show="titleState" @click="titleInputOpen">{{title}}</h4>
-    <el-input class="title-input" maxlength="15" @blur="titleInputClose" size="mini" :autofocus="true" v-show="!titleState" :autocomplete="false" v-model="title" placeholder="请输入简历标题"></el-input>
+    <el-input class="title-input" maxlength="15" @blur="titleInputClose" size="mini" :autofocus="true" v-show="!titleState" v-model="title" placeholder="请输入简历标题"></el-input>
   </div>
   <div class="nav">
     <div class="top-block">
       <span class="save">保存</span>
-      <span class="derive">导出</span>
+      <span class="derive" @click="downloadPage">导出</span>
     </div>
     <div class="bottom-block">
       <div class="row" @click="moduleState = true"><img class="block-icon" src="../assets/img/table.png"><span>模块管理</span></div>
@@ -17,7 +17,9 @@
       <div class="row" @click="styleState = true"><img class="block-icon" src="../assets/img/size.png"><span>风格设置</span></div>
     </div>
   </div>
-  <div class="resume"><module1></module1></div>
+  <div class="resume">
+    <module1></module1>
+  </div>
   <div class="module" v-show="moduleState">
     <div class="module-back" @click="moduleState = false"><img src="../assets/img/back-block.png"><span>缩起</span></div>
     <div class="module-row" style="margin-top:15px;">
@@ -94,6 +96,8 @@
 import $ from "jquery";
 import API from "../fetch/api.js";
 import module1 from "./module/module1";
+import html2canvas from 'html2canvas';
+import Canvas2Image from 'canvas2image';
 
 export default {
   data() {
@@ -142,16 +146,62 @@ export default {
     module1
   },
   created() {
-    API.reglet({
-      username: '123123213',
-      password: '123123',
-      question: "1",
-      answer: '12312'
-    }).then( res=> {
+    API.getdata({
+      moduleid: "3"
+    }).then(res => {
       console.log(res)
     })
   },
   methods: {
+    downloadPage() {
+      var self = this
+      var cntElem = $('#wrap')[0];
+
+      var shareContent = cntElem; //需要截图的包裹的（原生的）DOM 对象
+      var width = shareContent.offsetWidth; //获取dom 宽度
+      var height = shareContent.offsetHeight; //获取dom 高度
+
+      var canvas = document.createElement("canvas"); //创建一个canvas节点
+      var scale = 2; //定义任意放大倍数 支持小数
+      canvas.width = width * scale; //定义canvas 宽度 * 缩放
+      canvas.height = height * scale; //定义canvas高度 *缩放
+      //放大后再缩小提高清晰度
+      canvas.getContext("2d").scale(scale, scale);
+
+      console.log(width)
+      console.log(height)
+      // 设置html2canvas方法的配置
+      var opts = {
+        scale: scale, // 添加的scale 参数
+        canvas: canvas, //自定义 canvas
+        // allowTaint: true, //允许画布上有跨域图片 不建议使用 后面详细补充
+        // logging: true, //日志开关，便于查看html2canvas的内部执行流程
+        width: width, //dom 原始宽度
+        height: height,
+        useCORS: true // 【重要】开启跨域配置
+      };
+      // 开始转化为canvs对象
+      html2canvas(shareContent, opts).then(function(canvas) {
+        var context = canvas.getContext('2d');
+        // 【重要】关闭抗锯齿
+        context.mozImageSmoothingEnabled = false;
+        context.webkitImageSmoothingEnabled = false;
+        context.msImageSmoothingEnabled = false;
+        context.imageSmoothingEnabled = false;
+
+        // 【重要】默认转化的格式为png,也可设置为其他格式
+        var img = Canvas2Image.convertToJPEG(canvas, canvas.width, canvas.height);
+        //转化后放哪 最好放在与 .wrap 父级下
+        var detail = document.getElementById("wrap");
+        detail.appendChild(img);
+        // 最后设置img标签为正常高度宽度 提高清晰度
+        $(img).css({
+          "width": canvas.width / 2 + "px",
+          "height": canvas.height / 2 + "px",
+        }).addClass('f-full');
+
+      });
+    },
     titleInputOpen() {
       var self = this
       self.titleState = false

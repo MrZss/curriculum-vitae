@@ -18,42 +18,46 @@
     </div>
   </div>
   <div class="resume">
-    <module1></module1>
+    <module1 :blockState="blockState"></module1>
   </div>
   <div class="module" v-show="moduleState">
     <div class="module-back" @click="moduleState = false"><img src="../assets/img/back-block.png"><span>缩起</span></div>
-    <div class="module-row" style="margin-top:15px;">
+    <!-- <div class="module-row" style="margin-top:15px;">
       <span>基本信息</span>
       <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+    </div> -->
+    <div class="module-row" style="margin-top:15px;">
+      <span>求职意向</span>
+      <el-switch v-model="blockState.jobIntention" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
     </div>
     <div class="module-row">
-      <span>求职意向</span>
-      <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      <span>教育背景</span>
+      <el-switch v-model="blockState.workExperience" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
     </div>
     <div class="module-row">
       <span>工作经验</span>
-      <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      <el-switch v-model="blockState.workExperience" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
     </div>
     <div class="module-row">
       <span>志愿者经历</span>
-      <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      <el-switch v-model="blockState.volunteerExperience" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
     </div>
     <div class="module-row">
       <span>项目经验</span>
-      <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      <el-switch v-model="blockState.projectExperience" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
     </div>
     <div class="module-row">
       <span>自我评价</span>
-      <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      <el-switch v-model="blockState.selfAssessment" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
     </div>
     <div class="module-row">
       <span>奖项荣誉</span>
-      <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+      <el-switch v-model="blockState.awardHonor" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
     </div>
-    <div class="module-row">
+    <!-- <div class="module-row">
       <span>封面</span>
       <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-    </div>
+    </div> -->
   </div>
   <div class="change" v-show="changeState">
     <div class="change-back" @click="changeState = false"><img src="../assets/img/back-block.png"><span>缩起</span></div>
@@ -98,11 +102,20 @@ import API from "../fetch/api.js";
 import module1 from "./module/module1";
 import html2canvas from 'html2canvas';
 import Canvas2Image from 'canvas2image';
+import JsPDF from 'jspdf';
 
 export default {
   data() {
     return {
       saveTime: "2018-11-12 13:00:00 已保存",
+      blockState: {
+        jobIntention: true,
+        workExperience: true,
+        volunteerExperience: true,
+        projectExperience: true,
+        selfAssessment: true,
+        awardHonor: true,
+      },
       title: "查辰昊的简历",
       titleState: true,
       moduleState: false,
@@ -188,17 +201,44 @@ export default {
         context.webkitImageSmoothingEnabled = false;
         context.msImageSmoothingEnabled = false;
         context.imageSmoothingEnabled = false;
-
+        var contentWidth = canvas.width;
+        var contentHeight = canvas.height;
+        //一页pdf显示html页面生成的canvas高度;
+        var pageHeight = contentWidth / 592.28 * 841.89;
+        //未生成pdf的html页面高度
+        var leftHeight = contentHeight;
+        var imgWidth = 595.28;
+        var imgHeight = 592.28 / contentWidth * contentHeight;
+        //pdf页面偏移
+        var position = 0;
+        //var img = Canvas2Image.convertToJPEG(canvas, canvas.width, canvas.height);
+        var pageData = canvas.toDataURL('image/jpeg', 1.0);
+        var pdf = new JsPDF('', 'pt', 'a4');
+        if (leftHeight < pageHeight) {
+          pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
+        } else {
+          while (leftHeight > 0) {
+            pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
+            leftHeight -= pageHeight;
+            position -= 841.89;
+            //避免添加空白页
+            if (leftHeight > 0) {
+              pdf.addPage();
+            }
+          }
+        }
+        pdf.save('content.pdf');
         // 【重要】默认转化的格式为png,也可设置为其他格式
-        var img = Canvas2Image.convertToJPEG(canvas, canvas.width, canvas.height);
-        //转化后放哪 最好放在与 .wrap 父级下
-        var detail = document.getElementById("wrap");
-        detail.appendChild(img);
-        // 最后设置img标签为正常高度宽度 提高清晰度
-        $(img).css({
-          "width": canvas.width / 2 + "px",
-          "height": canvas.height / 2 + "px",
-        }).addClass('f-full');
+        // var img = Canvas2Image.convertToJPEG(canvas, canvas.width, canvas.height);
+        // //转化后放哪 最好放在与 .wrap 父级下
+        // // var detail = document.getElementById("wrap");
+        // // detail.appendChild(img);
+        // // 最后设置img标签为正常高度宽度 提高清晰度
+        // $(img).css({
+        //   "width": canvas.width / 2 + "px",
+        //   "height": canvas.height / 2 + "px",
+        // }).addClass('f-full');
+        // var pdf = new jsPDF('', 'pt', 'a4');
 
       });
     },

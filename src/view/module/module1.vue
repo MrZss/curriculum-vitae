@@ -1,12 +1,19 @@
 <template>
-<div class="wrap" id="wrap">
+<div class="wrap" id="wrap" v-if="blockState">
   <div class="left" :style="{'background': color}">
     <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
       <img v-if="imageUrl" :src="imageUrl" class="avatar">
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
-    <div class="base-option">
+    <div class="base-option" @click="basePopup = true">
       <i class="el-icon-edit-outline edit-icon"></i>
+      <div class="base-option-content">
+        <div class="base-option-content-row"><img src="../../assets/img/base-age.png"><span>{{age}}岁</span></div>
+        <div class="base-option-content-row"><img src="../../assets/img/base-work.png"><span>{{work}}</span></div>
+        <div class="base-option-content-row"><img src="../../assets/img/base-place.png"><span>{{place}}</span></div>
+        <div class="base-option-content-row"><img src="../../assets/img/base-phone.png"><span>{{phone}}</span></div>
+        <div class="base-option-content-row"><img src="../../assets/img/base-email.png"><span>{{email}}</span></div>
+      </div>
     </div>
     <div class="interest">
       <i class="el-icon-star-on title-icon"></i>
@@ -17,16 +24,16 @@
         </el-tag>
         <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
         </el-input>
-        <el-button v-else class="button-new-tag" size="small" @click="showInput">+ 添加标签</el-button>
+        <el-button v-else class="button-new-tag block-none" size="small" @click="showInput">+ 添加标签</el-button>
       </div>
     </div>
   </div>
   <div class="right" id="resume-details">
-    <div class="user-base">
+    <div class="user-base" @click="basePopup = true">
       <span class="name">{{name}}</span>
       <span class="introduce" :style="{'fontSize': fontSize}">{{introduce}}</span>
     </div>
-    <div class="intention" :style="{'fontSize': fontSize}">
+    <div class="intention" :style="{'fontSize': fontSize}" v-show="blockState.jobIntention" @click="intentionPopup = true">
       <span class="row"><img :style="{'height': fontSize}" src="../../assets/img/icons_card.png"><span>意向岗位：{{post}}</span></span>
       <span class="row"><img :style="{'height': fontSize}" src="../../assets/img/icons_pin.png"><span>{{place}}</span></span>
       <span class="row"><img :style="{'height': fontSize}" src="../../assets/img/icons_time.png"><span>{{arrivalTime}}</span></span>
@@ -40,16 +47,16 @@
       </div>
       <div class="list">
         <div class="time-school">
-          <el-date-picker v-model="value6" prefix-icon="icon-none" class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          <el-date-picker prefix-icon="icon-none" v-model="time1" class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
           </el-date-picker>
-          <input class="school" :style="{'font-size': fontSize}" v-model="school" placeholder="请填写学校名称"></input>
+          <input class="school" :style="{'font-size': fontSize}" placeholder="请填写学校名称"></input>
         </div>
-        <input class="major" :style="{'font-size': fontSize}" v-model="major" placeholder="请填写专业名称"></input>
-        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="尽量简洁，突出重点，成绩优异的话建议写上GPA及排名等信息，如：GPA：3.72/4（专业前10%）                      GRE：324" v-model="textarea2">
+        <input class="major" :style="{'font-size': fontSize}" placeholder="请填写专业名称"></input>
+        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="尽量简洁，突出重点，成绩优异的话建议写上GPA及排名等信息，如：GPA：3.72/4（专业前10%）GRE：324">
         </el-input>
       </div>
     </div>
-    <div class="repeat-block">
+    <div class="repeat-block" v-show="blockState.workExperience">
       <img>
       <div class="top">
         <img :style="{'background': color}" src="../../assets/img/work.png">
@@ -57,16 +64,16 @@
       </div>
       <div class="list">
         <div class="time-school">
-          <el-date-picker v-model="value6" prefix-icon="icon-none" class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          <el-date-picker prefix-icon="icon-none"v-model="time2" time1class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
           </el-date-picker>
-          <input class="school" :style="{'font-size': fontSize}" v-model="school" placeholder="请填写公司名称"></input>
+          <input class="school" :style="{'font-size': fontSize}" placeholder="请填写公司名称"></input>
         </div>
-        <input class="major" :style="{'font-size': fontSize}" v-model="major" placeholder="请填写职位名称"></input>
-        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="详细描述你的职责范围、工作任务及取得的成绩，工作经验的时间采取倒叙形式，最近经历写在前面，描述尽量具体简洁，工作经验的描述与目标岗位的招聘要求尽量匹配，用词精准。" v-model="textarea2">
+        <input class="major" :style="{'font-size': fontSize}" placeholder="请填写职位名称"></input>
+        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="详细描述你的职责范围、工作任务及取得的成绩，工作经验的时间采取倒叙形式，最近经历写在前面，描述尽量具体简洁，工作经验的描述与目标岗位的招聘要求尽量匹配，用词精准。">
         </el-input>
       </div>
     </div>
-    <div class="repeat-block">
+    <div class="repeat-block" v-show="blockState.volunteerExperience">
       <img>
       <div class="top">
         <img :style="{'background': color}" src="../../assets/img/volunteer.png">
@@ -74,51 +81,51 @@
       </div>
       <div class="list">
         <div class="time-school">
-          <el-date-picker v-model="value6" prefix-icon="icon-none" class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          <el-date-picker prefix-icon="icon-none" v-model="time3" class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
           </el-date-picker>
-          <input class="school" :style="{'font-size': fontSize}" v-model="school" placeholder="请填写公司名称"></input>
+          <input class="school" :style="{'font-size': fontSize}" placeholder="请填写公司名称"></input>
         </div>
-        <input class="major" :style="{'font-size': fontSize}" v-model="major" placeholder="请填写职位名称"></input>
-        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="详细描述你的职责范围、工作任务及取得的成绩，工作经验的时间采取倒叙形式，最近经历写在前面，描述尽量具体简洁，工作经验的描述与目标岗位的招聘要求尽量匹配，用词精准。" v-model="textarea2">
+        <input class="major" :style="{'font-size': fontSize}" placeholder="请填写职位名称"></input>
+        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="详细描述你的职责范围、工作任务及取得的成绩，工作经验的时间采取倒叙形式，最近经历写在前面，描述尽量具体简洁，工作经验的描述与目标岗位的招聘要求尽量匹配，用词精准。">
         </el-input>
       </div>
     </div>
-    <div class="repeat-block">
+    <div class="repeat-block" v-show="blockState.projectExperience">
       <img>
       <div class="top">
         <img :style="{'background': color}" src="../../assets/img/internship.png">
-        <span :style="{'color': color,'border-color': color}">实习经验</span>
+        <span :style="{'color': color,'border-color': color}">项目经验</span>
       </div>
       <div class="list">
         <div class="time-school">
-          <el-date-picker v-model="value6" prefix-icon="icon-none" class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+          <el-date-picker prefix-icon="icon-none" v-model="time4" class="data" :style="{'fontSize': fontSize}" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
           </el-date-picker>
-          <input class="school" :style="{'font-size': fontSize}" v-model="school" placeholder="请填写公司名称"></input>
+          <input class="school" :style="{'font-size': fontSize}" placeholder="请填写公司名称"></input>
         </div>
-        <input class="major" :style="{'font-size': fontSize}" v-model="major" placeholder="请填写职位名称"></input>
-        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="详细描述你的职责范围、工作任务及取得的成绩，工作经验的时间采取倒叙形式，最近经历写在前面，描述尽量具体简洁，工作经验的描述与目标岗位的招聘要求尽量匹配，用词精准。" v-model="textarea2">
+        <input class="major" :style="{'font-size': fontSize}" placeholder="请填写职位名称"></input>
+        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="详细描述你的职责范围、工作任务及取得的成绩，工作经验的时间采取倒叙形式，最近经历写在前面，描述尽量具体简洁，工作经验的描述与目标岗位的招聘要求尽量匹配，用词精准。">
         </el-input>
       </div>
     </div>
-    <div class="repeat-block">
+    <div class="repeat-block" v-show="blockState.selfAssessment">
       <img>
       <div class="top">
         <img :style="{'background': color}" src="../../assets/img/self.png">
         <span :style="{'color': color,'border-color': color}">自我评价</span>
       </div>
       <div class="list">
-        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="篇幅不要太长，注意结合简历整体的美观度，如果真的有很多话要说，建议以求职信的形式附上。自我评价应做到突出自身符合目标岗位要求的“卖点”，避免过多使用形容词，而应该通过数据及实例来对自身价值进行深化。" v-model="textarea2">
+        <el-input style="border: none" class="detail" type="textarea" autosize placeholder="篇幅不要太长，注意结合简历整体的美观度，如果真的有很多话要说，建议以求职信的形式附上。自我评价应做到突出自身符合目标岗位要求的“卖点”，避免过多使用形容词，而应该通过数据及实例来对自身价值进行深化。">
         </el-input>
       </div>
     </div>
-    <div class="repeat-block">
+    <div class="repeat-block" v-show="blockState.awardHonor">
       <img>
       <div class="top">
         <img :style="{'background': color}" src="../../assets/img/prize.png">
         <span :style="{'color': color,'border-color': color}">奖项荣誉</span>
       </div>
       <div class="list">
-        <el-input style="border: none" class="detail" @blur="getElementHeight" type="textarea" autosize placeholder="详细描述你所获得的奖项荣誉，时间倒叙，与目标岗位相关性强的写在前面，只写有代表性的奖项即可，同年或同类别的奖项可进行适当合并。" v-model="textarea2">
+        <el-input style="border: none" class="detail" @blur="getElementHeight" type="textarea" autosize placeholder="详细描述你所获得的奖项荣誉，时间倒叙，与目标岗位相关性强的写在前面，只写有代表性的奖项即可，同年或同类别的奖项可进行适当合并。">
         </el-input>
       </div>
     </div>
@@ -134,27 +141,27 @@
       <div class="content">
         <div class="row">
           <span>你的名字</span>
-          <input></input>
+          <input v-model="name"></input>
         </div>
         <div class="row">
-          <span>出生日期</span>
-          <input></input>
+          <span>年龄</span>
+          <input v-model="age"></input>
         </div>
         <div class="row">
           <span>工作年限</span>
-          <input></input>
+          <input v-model="work"></input>
         </div>
         <div class="row">
           <span>电话号码</span>
-          <input></input>
+          <input v-model="phone"></input>
         </div>
         <div class="row">
           <span>电子邮箱</span>
-          <input></input>
+          <input v-model="email"></input>
         </div>
         <div class="long-row">
           <span>一句话描述自己:</span>
-          <input></input>
+          <input v-model="introduce"></input>
         </div>
       </div>
       <el-button class="save" @click="saveBasePopup" type="success">保存内容</el-button>
@@ -172,19 +179,19 @@
       <div class="content">
         <div class="row">
           <span>意向岗位</span>
-          <input></input>
+          <input v-model="post"></input>
         </div>
         <div class="row">
           <span>意向城市</span>
-          <input></input>
+          <input v-model="place"></input>
         </div>
         <div class="row">
           <span>入职时间</span>
-          <input></input>
+          <input v-model="arrivalTime"></input>
         </div>
         <div class="row">
           <span>薪资要求</span>
-          <input></input>
+          <input v-model="money"></input>
         </div>
         <el-button class="save" @click="saveIntentionPopup" type="success">保存内容</el-button>
         <el-button class="cancel" @click="cancelIntentionPopup" type="info">取消编辑</el-button>
@@ -206,13 +213,23 @@ import Canvas2Image from 'canvas2image';
 export default {
   data() {
     return {
-
+      age: "22",
       observer: null,
+      work: "2年",
+      describe: "",
+      phone: "1333333333",
+      email: "735635367@qq.com",
       firedNum: 0,
       recordOldValue: { // 记录下旧的宽高数据，避免重复触发回调函数
         width: '0',
         height: '0'
       },
+      time1: "",
+      time2: "",
+      time3: "",
+      time4: "",
+      time5: "",
+      time6: "",
       basePopup: false,
       imageUrl: '',
       dynamicTags: ['标签一', '标签二', '标签三'],
@@ -231,24 +248,23 @@ export default {
       major: "计算机科学与技术"
     }
   },
+  props: ["blockState"],
   computed: {
     ...mapState({
       color: state => state.com.color
     })
   },
-  created() {
-  },
-  mounted() {
-  },
+  created() {},
+  mounted() {},
   methods: {
     //获取dom高度是否添加新也签
-    getElementHeight(){
+    getElementHeight() {
       var self = this
       console.log(111)
       console.log($('#resume-details').height())
       console.log($('#wrap').height())
-      if($('#resume-details').height() > $('#wrap').height()){
-        $('#wrap').height($('#wrap').height()+1160)
+      if ($('#resume-details').height() > $('#wrap').height()) {
+        $('#wrap').height($('#wrap').height() + 1160)
         console.log(11)
       }
     },
@@ -311,11 +327,24 @@ export default {
 </script>
 <style lang="scss">
 .avatar-uploader .el-upload {
-    border: 1px dashed #00c091;
+    border: 1px dashed transparent;
     border-radius: 6px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
+}
+.el-tag:hover {
+    .el-tag__close .el-icon-close {
+        display: block !important;
+    }
+}
+
+.el-tag__close .el-icon-close {
+    display: none!important;
+}
+
+.avatar-uploader .el-upload：hover {
+    border: 1px dashed #00c091;
 }
 
 .avatar-uploader .el-upload:hover {
@@ -414,8 +443,11 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
-        .base-option {
+        .base-option:hover {
             border: 1px dashed #00c091;
+        }
+        .base-option {
+            border: 1px dashed transparent;
             width: 200px;
             height: 200px;
             margin-top: 20px;
@@ -426,19 +458,48 @@ export default {
                 font-size: 25px;
                 color: #00c091;
             }
+            .base-option-content {
+                width: 100%;
+                margin-top: 20px;
+                img {
+                    margin-left: 5px;
+                    height: 20px;
+                    width: 20px;
+                    border-radius: 15px;
+                    background: white;
+                }
+                span {
+                    margin-left: 10px;
+                }
+                .base-option-content-row {
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    color: white;
+                }
+            }
         }
         .base-option:hover {
             .edit-icon {
                 display: block;
             }
         }
-        .interest {
+        .interest:hover {
             border: 1px dashed #00c091;
+            .block-none {
+                display: block;
+            }
+        }
+        .interest {
+            border: 1px dashed transparent;
             width: 200px;
             height: auto;
             margin-top: 20px;
             border-radius: 6px;
             padding-bottom: 20px;
+            .block-none {
+                display: none;
+            }
             .title-icon {
                 float: left;
                 /* top: 10px; */
@@ -477,6 +538,9 @@ export default {
         flex-direction: column;
         align-items: center;
         background: white;
+        .user-base:hover {
+            border: 1px dashed #00c091;
+        }
         .user-base {
             min-height: 140px;
             width: 90%;
@@ -490,7 +554,7 @@ export default {
             -webkit-box-pack: center;
             -ms-flex-pack: center;
             justify-content: center;
-            border: 1px dashed #00c091;
+            border: 1px dashed transparent;
             margin-top: 15px;
             .name {
                 height: 30px;
@@ -505,9 +569,12 @@ export default {
 
             }
         }
+        .intention:hover {
+            border: 1px dashed #00c091;
+        }
         .intention {
             width: 90%;
-            border: 1px dashed #00c091;
+            border: 1px dashed transparent;
             height: auto;
             padding-bottom: 10px;
             margin-top: 10px;
@@ -528,11 +595,14 @@ export default {
 
             }
         }
+        .repeat-block:hover {
+            border: 1px dashed #00c091;
+        }
         .repeat-block {
             width: 90%;
             position: relative;
             margin-top: 10px;
-            border: 1px dashed #00c091;
+            border: 1px dashed transparent;
             .top {
                 height: 26px;
                 width: 100%;
